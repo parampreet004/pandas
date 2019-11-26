@@ -16,3 +16,4 @@ dependencies:
 - hypothesis>=3.58.0
 - pip
 - pip:
+  - moto
