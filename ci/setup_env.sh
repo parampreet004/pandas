@@ -160,6 +160,7 @@ echo "[Install pandas]"
 sudo chmod -R 777 /home/travis/archiconda3/envs/pandas-dev/lib/python3.7/site-packages
 sudo python3.7 -m pip install numpy
 sudo python3.7 -m pip install pytest-xvfb
+sudo python3.7 -m pip install hypothesis
 sudo python3.7 -m pip install --no-build-isolation -e .
 sudo chmod -R 777 $MINICONDA_DIR
 
