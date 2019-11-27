@@ -34,7 +34,7 @@ fi
 # Travis does not have have an X server
 if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
     DISPLAY=DISPLAY=:99.0
-    PYTEST_CMD="xvfb-run -e /dev/stdout $PYTEST_CMD"
+    PYTEST_CMD="sudo xvfb-run -e /dev/stdout $PYTEST_CMD"
 fi
 
 echo $PYTEST_CMD
