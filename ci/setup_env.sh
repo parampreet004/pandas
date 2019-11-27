@@ -179,12 +179,11 @@ $IS_SUDO python3.7 -m pip install --no-deps -U pip wheel setuptools
 echo "[Install pandas]"
 if [ `uname -m` = 'aarch64' ]; then
     $IS_SUDO chmod -R 777 $MINICONDA_DIR
+    $IS_SUDO python3.7 -m pip install numpy
     $IS_SUDO python3.7 -m pip install --no-build-isolation -e .
 else
     python -m pip install --no-build-isolation -e .
 fi    
-
-
 
 echo
 echo "conda list"
