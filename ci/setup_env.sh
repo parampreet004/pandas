@@ -34,7 +34,6 @@ if [[ "$UNAME_OS" == 'Linux' ]]; then
         CONDA_OS="Linux-x86"
     else
         CONDA_OS="Linux-x86_64"
-        echo "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%2"
     fi
 elif [[ "$UNAME_OS" == 'Darwin' ]]; then
     CONDA_OS="MacOSX-x86_64"
@@ -42,9 +41,8 @@ else
   echo "OS $UNAME_OS not supported"
   exit 1
 fi
-echo "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%1"
+
 if [ `uname -m` = 'aarch64' ]; then
-echo "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%3"
    wget -q "https://github.com/Archiconda/build-tools/releases/download/0.2.3/Archiconda3-0.2.3-Linux-aarch64.sh" -O archiconda.sh
    chmod +x archiconda.sh
    $IS_SUDO apt-get install python-dev
@@ -59,7 +57,6 @@ echo "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%3"
    $IS_SUDO chmod -R 777 $MINICONDA_DIR
    $IS_SUDO cp $MINICONDA_DIR/bin/* /usr/bin/
    $IS_SUDO rm /usr/bin/lsb_release
-   echo "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%4"
 else
    wget -q "https://repo.continuum.io/miniconda/Miniconda3-latest-$CONDA_OS.sh" -O miniconda.sh
    chmod +x miniconda.sh
