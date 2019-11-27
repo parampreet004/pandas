@@ -123,7 +123,7 @@ if [ `uname -m` = 'aarch64' ]; then
     #$IS_SUDO conda install pyarrow
     $IS_SUDO conda install s3fs
     #$IS_SUDO conda install boto3
-    $IS_SUDO conda install s3transfer[version='>=0.2.0,<0.3.0']
+    $IS_SUDO conda install s3transfer
     $IS_SUDO conda install pyreadstat
     $IS_SUDO python3.7 -m pip install pytest-xvfb
     $IS_SUDO python3.7 -m pip install python-dateutil
