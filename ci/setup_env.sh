@@ -183,6 +183,7 @@ if [ `uname -m` = 'aarch64' ]; then
     $IS_SUDO chmod -R 777 $MINICONDA_DIR
     $IS_SUDO python3.7 -m pip install numpy
     $IS_SUDO python3.7 -m pip install hypothesis
+    $IS_SUDO python3.7 -m pip install vispy
     $IS_SUDO python3.7 -m pip install --no-build-isolation -e .
 else
     python -m pip install --no-build-isolation -e .
