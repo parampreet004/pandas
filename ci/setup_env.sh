@@ -128,7 +128,8 @@ if [ `uname -m` = 'aarch64' ]; then
     $IS_SUDO conda pip install pyreadstat    
     $IS_SUDO python3.7 -m pip install python-dateutil
     $IS_SUDO chmod -R 777 $MINICONDA_DIR
-else
+fi
+
 echo "conda env create -q --file=${ENV_FILE}"
 time $IS_SUDO conda env create -q --file="${ENV_FILE}"
 
