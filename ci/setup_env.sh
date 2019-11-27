@@ -116,17 +116,18 @@ conda remove --all -q -y -n pandas-dev
 echo
 if [ `uname -m` = 'aarch64' ]; then
     $IS_SUDO chmod -R 777 $MINICONDA_DIR
+    $IS_SUDO conda install botocore    
     $IS_SUDO conda install numpy
+    $IS_SUDO conda install python-dateutil    
     $IS_SUDO conda install hypothesis
     $IS_SUDO conda install pytz
-    $IS_SUDO conda install nomkl
+    #$IS_SUDO conda install nomkl
     #$IS_SUDO conda install pyarrow
-    $IS_SUDO conda install s3fs
+    #$IS_SUDO conda install s3fs
     #$IS_SUDO conda install boto3
-    $IS_SUDO conda install s3transfer
-    $IS_SUDO conda install pyreadstat
+    #$IS_SUDO conda install s3fs
+    #$IS_SUDO conda install pyreadstat
     $IS_SUDO python3.7 -m pip install pytest-xvfb
-    $IS_SUDO python3.7 -m pip install python-dateutil
     $IS_SUDO chmod -R 777 $MINICONDA_DIR
 fi
 
