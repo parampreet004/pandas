@@ -31,15 +31,18 @@ PYTEST_CMD="pytest -m \"$PATTERN\" -n auto --dist=loadfile -s --strict --duratio
 if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
     DISPLAY=DISPLAY=:99.0
     if [ `uname -m` = 'aarch64' ]; then
-        PYTEST_CMD="pytest pandas"
-        sudo xvfb-run -e /dev/stdout $PYTEST_CMD
+        PYTEST_CMD="xvfb-run -e /dev/stdout pytest -m \"$PATTERN\" pandas"
     else
         PYTEST_CMD="xvfb-run -e /dev/stdout $PYTEST_CMD"
     fi
 fi
 
 echo $PYTEST_CMD
-sh -c "$PYTEST_CMD"
+if [ `uname -m` = 'aarch64' ]; then
+    sudo sh -c "$PYTEST_CMD"
+else
+    sh -c "$PYTEST_CMD"
+fi
 
 if [[ "$COVERAGE" && $? == 0 && "$TRAVIS_BRANCH" == "master" ]]; then
     echo "uploading coverage"
