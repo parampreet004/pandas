@@ -12,9 +12,11 @@ if [ -n "$LOCALE_OVERRIDE" ]; then
     sudo locale-gen "$LOCALE_OVERRIDE"
 fi
 
-UNAME_ARCH=$(uname -m)
-if [ "$UNAME_ARCH" == 'aarch64' ]; then
+IS_SUDO=""
+
+if [ `uname -m` = 'aarch64' ]; then
    MINICONDA_DIR="$HOME/archiconda3"
+   IS_SUDO="sudo"
 else
    MINICONDA_DIR="$HOME/miniconda3"
 fi
@@ -40,24 +42,19 @@ else
   exit 1
 fi
 
-echo "who am i"
-whoami
-
-if [ "$UNAME_ARCH" == 'aarch64' ]; then
+if [ `uname -m` = 'aarch64' ]; then
    wget -q "https://github.com/Archiconda/build-tools/releases/download/0.2.3/Archiconda3-0.2.3-Linux-aarch64.sh" -O archiconda.sh
    chmod +x archiconda.sh
-   sudo apt-get install python-dev
-   sudo apt-get install python3-pip
-   sudo apt-get install libpython3.7-dev
-   sudo apt-get install xvfb
-    echo "/usr/local/bin/: "
-    sudo ls /usr/local/bin/
+   $IS_SUDO apt-get install python-dev
+   $IS_SUDO apt-get install python3-pip
+   $IS_SUDO apt-get install libpython3.7-dev
+   $IS_SUDO apt-get install xvfb
    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib:/usr/local/lib:/usr/local/bin/python
    ./archiconda.sh -b
    echo "chmod MINICONDA_DIR"
-   sudo chmod -R 777 $MINICONDA_DIR
-   sudo cp $MINICONDA_DIR/bin/* /usr/bin/
-   sudo rm /usr/bin/lsb_release
+   $IS_SUDO chmod -R 777 $MINICONDA_DIR
+   $IS_SUDO cp $MINICONDA_DIR/bin/* /usr/bin/
+   $IS_SUDO rm /usr/bin/lsb_release
 else
    wget -q "https://repo.continuum.io/miniconda/Miniconda3-latest-$CONDA_OS.sh" -O miniconda.sh
    chmod +x miniconda.sh
@@ -74,8 +71,8 @@ echo
 echo "update conda"
 conda config --set ssl_verify false
 conda config --set quiet true --set always_yes true --set changeps1 false
-sudo conda install pip  # create conda to create a historical artifact for pip & setuptools
-sudo conda update -n base conda
+$IS_SUDO conda install pip  # create conda to create a historical artifact for pip & setuptools
+$IS_SUDO conda update -n base conda
 
 echo "conda info -a"
 conda info -a
@@ -115,8 +112,24 @@ conda list
 conda remove --all -q -y -n pandas-dev
 
 echo
+if [ `uname -m` = 'aarch64' ]; then
+    $IS_SUDO chmod -R 777 $MINICONDA_DIR
+    $IS_SUDO conda install botocore    
+    $IS_SUDO conda install numpy
+    $IS_SUDO conda install python-dateutil    
+    $IS_SUDO conda install hypothesis
+    $IS_SUDO conda install pytz
+    #$IS_SUDO conda install nomkl
+    #$IS_SUDO conda install pyarrow
+    #$IS_SUDO conda install s3fs
+    #$IS_SUDO conda install boto3
+    #$IS_SUDO conda install s3fs
+    #$IS_SUDO conda install pyreadstat
+    $IS_SUDO chmod -R 777 $MINICONDA_DIR
+fi
+
 echo "conda env create -q --file=${ENV_FILE}"
-time sudo conda env create -q --file="${ENV_FILE}"
+time $IS_SUDO conda env create -q --file="${ENV_FILE}"
 
 
 if [[ "$BITS32" == "yes" ]]; then
@@ -130,13 +143,17 @@ source activate pandas-dev
 echo
 echo "remove any installed pandas package"
 echo "w/o removing anything else"
-sudo conda remove pandas -y --force || true
-sudo python3.7 -m pip uninstall -y pandas || true
+$IS_SUDO conda remove pandas -y --force || true
+if [ `uname -m` = 'aarch64' ]; then
+    $IS_SUDO python3.7 -m pip uninstall -y pandas || true
+else
+    pip uninstall -y pandas || true
+fi    
 
 echo
 echo "remove postgres if has been installed with conda"
 echo "we use the one from the CI"
-sudo conda remove postgresql -y --force || true
+$IS_SUDO conda remove postgresql -y --force || true
 
 echo
 echo "conda list pandas"
@@ -154,28 +171,41 @@ python setup.py build_ext -q -i
 # - py35_compat
 # - py36_32bit
 echo "[Updating pip]"
-sudo python3.7 -m pip install --no-deps -U pip wheel setuptools
+if [ `uname -m` = 'aarch64' ]; then
+    sudo chmod -R 777 /home/travis/archiconda3/envs/pandas-dev/lib/python3.7/site-packages
+    $IS_SUDO python3.7 -m pip install pytest-xvfb
+    $IS_SUDO python3.7 -m pip install --no-deps -U pip wheel setuptools
+    sudo chmod -R 777 $MINICONDA_DIR
+else
+    python -m pip install --no-deps -U pip wheel setuptools
+fi
 
 echo "[Install pandas]"
-sudo chmod -R 777 /home/travis/archiconda3/envs/pandas-dev/lib/python3.7/site-packages
-sudo python3.7 -m pip install numpy
-sudo python3.7 -m pip install pytest-xvfb
-sudo python3.7 -m pip install hypothesis
-sudo python3.7 -m pip install vispy
-sudo python3.7 -m pip install --no-build-isolation -e .
-sudo chmod -R 777 $MINICONDA_DIR
+if [ `uname -m` = 'aarch64' ]; then
+    $IS_SUDO chmod -R 777 $MINICONDA_DIR
+    $IS_SUDO python3.7 -m pip install numpy
+    $IS_SUDO python3.7 -m pip install hypothesis
+    $IS_SUDO python3.7 -m pip install --no-build-isolation -e .
+else
+    python -m pip install --no-build-isolation -e .
+fi    
 
 echo
 echo "conda list"
 conda list
 
 # Install DB for Linux
-#if [ "${TRAVIS_OS_NAME}" == "linux" ]; then
- # echo "installing dbs"
- # mysql -e 'create database pandas_nosetest;'
- # psql -c 'create database pandas_nosetest;' -U postgres
-#else
- #  echo "not using dbs on non-linux Travis builds or Azure Pipelines"
-#fi
+if [ "${TRAVIS_OS_NAME}" == "linux" ]; then
+  echo "installing dbs"
+  if [ `uname -m` = 'aarch64' ]; then
+    sudo systemctl start mysql
+    #sudo service postgresql start
+  else
+    psql -c 'create database pandas_nosetest;' -U postgres
+  fi
+  mysql -e 'create database pandas_nosetest;'
+else
+   echo "not using dbs on non-linux Travis builds or Azure Pipelines"
+fi
 
 echo "done"
